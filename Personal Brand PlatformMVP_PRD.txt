@@ -1,0 +1,104 @@
+Product
+
+Hybrid personal brand platform
+
+Not just a CV site. It should show:
+
+technical credibility
+creative identity
+projects
+writing later
+analytics/product maturity later
+Stack
+Next.js App Router
+TypeScript
+Tailwind
+Supabase Postgres
+Prisma
+Supabase Auth later
+PostHog later
+
+Supabase is a good fit because it gives you managed Postgres, auth, storage, and future user-management paths without rebuilding the backend later. Supabase has official Next.js and Prisma guidance.
+
+MVP / PRD
+V1 Goal
+
+Build a local-first personal brand platform with DB-managed content from day one.
+
+V1 Pages
+Page	Purpose
+/	Landing page / personal brand
+/about	Story, background, education, personality
+/experience	Work timeline
+/projects	Technical projects
+/projects/[slug]	Project detail page
+/contact	Contact form
+Future Pages
+Page	Phase
+/blog	V2
+/gallery	V2/V3
+/admin	V2
+/login	V2
+/dashboard	V3
+Brand Direction
+Brand Type
+
+Hybrid: technical operator + creative builder
+
+Positioning
+
+I build systems that make complex technical work easier to understand, operate, and scale.
+
+Personality Layer
+
+Use sections like:
+
+“Data systems”
+“Customer onboarding”
+“Education”
+“Sports mindset”
+“Creative experiments”
+“Builder notes”
+
+Avoid making it too corporate. Your edge is that you are technical, but not dry.
+
+Data Model
+projects
+model Project {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  summary     String
+  content     String
+  category    String
+  techStack   String[]
+  status      String   @default("published")
+  featured    Boolean  @default(false)
+  orderIndex  Int      @default(0)
+  githubUrl   String?
+  demoUrl     String?
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+contacts
+model Contact {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  message   String
+  source    String? 
+  createdAt DateTime @default(now())
+}
+Future: posts
+model Post {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  excerpt     String
+  content     String
+  status      String   @default("draft")
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
