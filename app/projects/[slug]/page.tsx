@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Code2, ExternalLink } from "lucide-react";
+import { ProjectViewTracker } from "@/components/analytics/ProjectViewTracker";
+import { TrackedLink } from "@/components/analytics/TrackedLink";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { trackAnalyticsEvent } from "@/lib/analytics";
 import { getProjectBySlug } from "@/lib/projects";
 
 export const dynamic = "force-dynamic";
@@ -13,6 +14,14 @@ type ProjectDetailPageProps = {
     slug: string;
   }>;
 };
+
+function getDestinationHost(href: string) {
+  try {
+    return new URL(href).hostname;
+  } catch {
+    return undefined;
+  }
+}
 
 export async function generateMetadata({
   params,
@@ -62,14 +71,17 @@ export default async function ProjectDetailPage({
     notFound();
   }
 
-  await trackAnalyticsEvent("project_viewed", {
-    slug: project.slug,
-  });
-
   const paragraphs = project.content.split("\n\n");
+  const sourcePage = `/projects/${project.slug}`;
 
   return (
     <>
+      <ProjectViewTracker
+        project_slug={project.slug}
+        project_title={project.title}
+        category={project.category}
+      />
+
       <section className="border-b border-black/10 bg-white py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-5 sm:px-8">
           <Link
@@ -105,22 +117,42 @@ export default async function ProjectDetailPage({
 
           <div className="mt-8 flex flex-wrap gap-3">
             {project.githubUrl ? (
-              <Link
+              <TrackedLink
                 href={project.githubUrl}
+                analyticsEvent="external_link_clicked"
+                analyticsProperties={{
+                  href: project.githubUrl,
+                  label: "Code",
+                  source_page: sourcePage,
+                  destination_host: getDestinationHost(project.githubUrl),
+                  project_slug: project.slug,
+                  project_title: project.title,
+                  link_type: "github",
+                }}
                 className="inline-flex min-h-10 items-center gap-2 rounded-md border border-black/15 bg-white px-4 py-2 text-sm font-semibold text-neutral-950 shadow-sm transition hover:bg-neutral-50"
               >
                 <Code2 size={16} />
                 Code
-              </Link>
+              </TrackedLink>
             ) : null}
             {project.demoUrl ? (
-              <Link
+              <TrackedLink
                 href={project.demoUrl}
+                analyticsEvent="external_link_clicked"
+                analyticsProperties={{
+                  href: project.demoUrl,
+                  label: "Demo",
+                  source_page: sourcePage,
+                  destination_host: getDestinationHost(project.demoUrl),
+                  project_slug: project.slug,
+                  project_title: project.title,
+                  link_type: "demo",
+                }}
                 className="inline-flex min-h-10 items-center gap-2 rounded-md bg-neutral-950 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-neutral-800"
               >
                 <ExternalLink size={16} />
                 Demo
-              </Link>
+              </TrackedLink>
             ) : null}
           </div>
         </div>

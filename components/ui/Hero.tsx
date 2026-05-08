@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   Activity,
   ArrowRight,
@@ -8,6 +7,7 @@ import {
   Send,
   Trophy,
 } from "lucide-react";
+import { TrackedLink } from "@/components/analytics/TrackedLink";
 
 type HeroProps = {
   eyebrow: string;
@@ -16,11 +16,14 @@ type HeroProps = {
   primaryCta?: {
     href: string;
     label: string;
+    variant?: string;
   };
   secondaryCta?: {
     href: string;
     label: string;
+    variant?: string;
   };
+  sourcePage?: string;
   compact?: boolean;
 };
 
@@ -38,6 +41,7 @@ export function Hero({
   description,
   primaryCta,
   secondaryCta,
+  sourcePage = "unknown",
   compact = false,
 }: HeroProps) {
   return (
@@ -60,22 +64,36 @@ export function Hero({
           {primaryCta || secondaryCta ? (
             <div className="mt-9 flex flex-wrap gap-3">
               {primaryCta ? (
-                <Link
+                <TrackedLink
                   href={primaryCta.href}
+                  analyticsEvent="hero_cta_clicked"
+                  analyticsProperties={{
+                    cta_label: primaryCta.label,
+                    destination: primaryCta.href,
+                    source_page: sourcePage,
+                    variant: primaryCta.variant,
+                  }}
                   className="inline-flex min-h-11 items-center gap-2 rounded-md bg-neutral-950 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-neutral-800"
                 >
                   {primaryCta.label}
                   <ArrowRight size={17} />
-                </Link>
+                </TrackedLink>
               ) : null}
               {secondaryCta ? (
-                <Link
+                <TrackedLink
                   href={secondaryCta.href}
+                  analyticsEvent="hero_cta_clicked"
+                  analyticsProperties={{
+                    cta_label: secondaryCta.label,
+                    destination: secondaryCta.href,
+                    source_page: sourcePage,
+                    variant: secondaryCta.variant,
+                  }}
                   className="inline-flex min-h-11 items-center gap-2 rounded-md border border-black/15 bg-white px-5 py-3 text-sm font-semibold text-neutral-950 shadow-sm transition hover:border-black/25 hover:bg-neutral-50"
                 >
                   <Send size={16} />
                   {secondaryCta.label}
-                </Link>
+                </TrackedLink>
               ) : null}
             </div>
           ) : null}

@@ -56,8 +56,17 @@ export default async function Home() {
         eyebrow="Creative technical operator"
         title="Irdi Duka"
         description="I build systems that make complex technical work easier to understand, operate, and scale."
-        primaryCta={{ href: "/projects", label: "Explore projects" }}
-        secondaryCta={{ href: "/contact", label: "Contact Irdi" }}
+        primaryCta={{
+          href: "/projects",
+          label: "Explore projects",
+          variant: "primary",
+        }}
+        secondaryCta={{
+          href: "/contact",
+          label: "Contact Irdi",
+          variant: "secondary",
+        }}
+        sourcePage="/"
       />
 
       <section className="border-b border-black/10 bg-white py-16 sm:py-20">
@@ -117,8 +126,13 @@ export default async function Home() {
             </div>
           ) : (
             <div className="mt-10 grid gap-5 md:grid-cols-3">
-              {projects.map((project) => (
-                <ProjectCard key={project.id} project={project} />
+              {projects.map((project, index) => (
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  position={index + 1}
+                  sourcePage="/"
+                />
               ))}
             </div>
           )}

@@ -75,7 +75,7 @@ export default function ContactPage() {
             </div>
           </div>
 
-          <ContactForm />
+          <ContactForm sourcePage="/contact" />
         </div>
       </section>
     </>

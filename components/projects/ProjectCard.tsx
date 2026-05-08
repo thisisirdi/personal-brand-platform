@@ -1,15 +1,38 @@
 import type { Project } from "@/generated/prisma/client";
-import Link from "next/link";
 import { ArrowUpRight, Code2, ExternalLink } from "lucide-react";
+import { TrackedLink } from "@/components/analytics/TrackedLink";
 
 type ProjectCardProps = {
   project: Project;
+  position: number;
+  sourcePage: string;
 };
 
-export function ProjectCard({ project }: ProjectCardProps) {
+function getDestinationHost(href: string) {
+  try {
+    return new URL(href).hostname;
+  } catch {
+    return undefined;
+  }
+}
+
+export function ProjectCard({ project, position, sourcePage }: ProjectCardProps) {
+  const projectHref = `/projects/${project.slug}`;
+  const projectClickProperties = {
+    project_slug: project.slug,
+    project_title: project.title,
+    position,
+    source_page: sourcePage,
+  };
+
   return (
     <article className="group flex h-full flex-col rounded-lg border border-black/10 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-teal-700/35 hover:shadow-lg hover:shadow-neutral-950/8">
-      <Link href={`/projects/${project.slug}`} className="block">
+      <TrackedLink
+        href={projectHref}
+        analyticsEvent="project_card_clicked"
+        analyticsProperties={projectClickProperties}
+        className="block"
+      >
         <div className="signal-grid grid aspect-[16/9] place-items-center overflow-hidden rounded-md border border-black/10 bg-neutral-950">
           <div className="w-3/4 rounded-md border border-white/15 bg-white/8 p-4 text-white backdrop-blur">
             <p className="text-xs font-semibold tracking-[0.14em] text-teal-200 uppercase">
@@ -18,7 +41,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
             <p className="mt-3 text-xl font-semibold">{project.title}</p>
           </div>
         </div>
-      </Link>
+      </TrackedLink>
 
       <div className="mt-5 flex flex-1 flex-col">
         <div className="flex items-start justify-between gap-4">
@@ -27,7 +50,13 @@ export function ProjectCard({ project }: ProjectCardProps) {
               {project.category}
             </p>
             <h3 className="mt-2 text-xl font-semibold text-neutral-950">
-              <Link href={`/projects/${project.slug}`}>{project.title}</Link>
+              <TrackedLink
+                href={projectHref}
+                analyticsEvent="project_card_clicked"
+                analyticsProperties={projectClickProperties}
+              >
+                {project.title}
+              </TrackedLink>
             </h3>
           </div>
           <ArrowUpRight
@@ -53,30 +82,52 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
         <div className="mt-5 flex flex-wrap gap-2">
           {project.githubUrl ? (
-            <Link
+            <TrackedLink
               href={project.githubUrl}
+              analyticsEvent="external_link_clicked"
+              analyticsProperties={{
+                href: project.githubUrl,
+                label: "Code",
+                source_page: sourcePage,
+                destination_host: getDestinationHost(project.githubUrl),
+                project_slug: project.slug,
+                project_title: project.title,
+                link_type: "github",
+              }}
               className="inline-flex min-h-9 items-center gap-2 rounded-md border border-black/10 px-3 py-2 text-sm font-semibold text-neutral-800 transition hover:bg-neutral-100"
             >
               <Code2 size={15} />
               Code
-            </Link>
+            </TrackedLink>
           ) : null}
           {project.demoUrl ? (
-            <Link
+            <TrackedLink
               href={project.demoUrl}
+              analyticsEvent="external_link_clicked"
+              analyticsProperties={{
+                href: project.demoUrl,
+                label: "Demo",
+                source_page: sourcePage,
+                destination_host: getDestinationHost(project.demoUrl),
+                project_slug: project.slug,
+                project_title: project.title,
+                link_type: "demo",
+              }}
               className="inline-flex min-h-9 items-center gap-2 rounded-md border border-black/10 px-3 py-2 text-sm font-semibold text-neutral-800 transition hover:bg-neutral-100"
             >
               <ExternalLink size={15} />
               Demo
-            </Link>
+            </TrackedLink>
           ) : null}
-          <Link
-            href={`/projects/${project.slug}`}
+          <TrackedLink
+            href={projectHref}
+            analyticsEvent="project_card_clicked"
+            analyticsProperties={projectClickProperties}
             className="inline-flex min-h-9 items-center gap-2 rounded-md bg-neutral-950 px-3 py-2 text-sm font-semibold text-white transition hover:bg-neutral-800"
           >
             Read case
             <ArrowUpRight size={15} />
-          </Link>
+          </TrackedLink>
         </div>
       </div>
     </article>

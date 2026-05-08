@@ -3,6 +3,18 @@ import { trackAnalyticsEvent } from "@/lib/analytics";
 import { getPrisma, hasDatabaseUrl } from "@/lib/prisma";
 import { contactInputSchema } from "@/lib/validation/contact";
 
+function getSourcePage(body: unknown) {
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return undefined;
+  }
+
+  const source = (body as { source?: unknown }).source;
+
+  return typeof source === "string" && source.trim()
+    ? source.trim()
+    : undefined;
+}
+
 export async function POST(request: Request) {
   let body: unknown;
 
@@ -21,15 +33,20 @@ export async function POST(request: Request) {
   const parsed = contactInputSchema.safeParse(body);
 
   if (!parsed.success) {
+    const fieldErrors = parsed.error.flatten().fieldErrors;
+
     await trackAnalyticsEvent("contact_failed", {
       reason: "validation",
+      source_page: getSourcePage(body),
+      status_code: 400,
+      field_count: Object.keys(fieldErrors).length,
     });
 
     return NextResponse.json(
       {
         ok: false,
         message: "Please fix the highlighted fields.",
-        fieldErrors: parsed.error.flatten().fieldErrors,
+        fieldErrors,
       },
       { status: 400 },
     );
@@ -38,6 +55,8 @@ export async function POST(request: Request) {
   if (!hasDatabaseUrl()) {
     await trackAnalyticsEvent("contact_failed", {
       reason: "missing_database_url",
+      source_page: parsed.data.source,
+      status_code: 503,
     });
 
     return NextResponse.json(
@@ -56,8 +75,8 @@ export async function POST(request: Request) {
     });
 
     await trackAnalyticsEvent("contact_submitted", {
-      contactId: contact.id,
-      source: parsed.data.source ?? "unknown",
+      contact_id: contact.id,
+      source_page: parsed.data.source,
     });
 
     return NextResponse.json(
@@ -72,6 +91,8 @@ export async function POST(request: Request) {
 
     await trackAnalyticsEvent("contact_failed", {
       reason: "database",
+      source_page: parsed.data.source,
+      status_code: 500,
     });
 
     return NextResponse.json(

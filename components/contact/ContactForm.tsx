@@ -1,7 +1,8 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import { AlertCircle, CheckCircle2, Send } from "lucide-react";
+import { useAnalytics } from "@/lib/useAnalytics";
 import {
   contactInputSchema,
   type ContactInput,
@@ -15,20 +16,41 @@ type ContactApiResponse = {
   fieldErrors?: FieldErrors;
 };
 
-const initialForm = {
-  name: "",
-  email: "",
-  message: "",
-  source: "contact-page",
+function getInitialForm(sourcePage: string): ContactInput {
+  return {
+    name: "",
+    email: "",
+    message: "",
+    source: sourcePage,
+  };
+}
+
+type ContactFormProps = {
+  sourcePage?: string;
 };
 
-export function ContactForm() {
-  const [form, setForm] = useState<ContactInput>(initialForm);
+export function ContactForm({ sourcePage = "/contact" }: ContactFormProps) {
+  const { capture } = useAnalytics();
+  const hasTrackedStart = useRef(false);
+  const [form, setForm] = useState<ContactInput>(() =>
+    getInitialForm(sourcePage),
+  );
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">(
     "idle",
   );
   const [notice, setNotice] = useState("");
+
+  function trackContactFormStarted() {
+    if (hasTrackedStart.current) {
+      return;
+    }
+
+    hasTrackedStart.current = true;
+    capture("contact_form_started", {
+      source_page: sourcePage,
+    });
+  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -63,7 +85,7 @@ export function ContactForm() {
         return;
       }
 
-      setForm(initialForm);
+      setForm(getInitialForm(sourcePage));
       setStatus("success");
       setNotice(data.message);
     } catch {
@@ -73,6 +95,8 @@ export function ContactForm() {
   }
 
   function updateField(field: keyof ContactInput, value: string) {
+    trackContactFormStarted();
+
     setForm((current) => ({
       ...current,
       [field]: value,
@@ -82,6 +106,7 @@ export function ContactForm() {
   return (
     <form
       onSubmit={onSubmit}
+      onFocusCapture={trackContactFormStarted}
       className="rounded-lg border border-black/10 bg-white p-5 shadow-sm sm:p-6"
       noValidate
     >
