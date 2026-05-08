@@ -28,8 +28,8 @@ export default async function ProjectsPage() {
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <SectionHeader
             eyebrow="Project library"
-            title="Systems, onboarding, APIs, and experiments."
-            description="The current seed set gives the platform useful content immediately while keeping the data model ready for real case studies."
+            title="Systems, data tools, migrations, and product demos."
+            description="These case notes document real repositories and technical work from GitHub, with private repositories summarized without public code links."
           />
 
           {unavailable ? (

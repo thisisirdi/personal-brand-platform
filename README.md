@@ -69,7 +69,7 @@ npm run prisma:generate
 npm run prisma:migrate -- --name init
 ```
 
-7. Seed the first three projects:
+7. Seed the GitHub-backed project library:
 
 ```bash
 npm run db:seed

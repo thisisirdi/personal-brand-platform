@@ -107,8 +107,8 @@ export default async function Home() {
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <SectionHeader
               eyebrow="Selected builds"
-              title="Projects managed from the database."
-              description="V1 starts with Prisma-backed project content so the platform can grow into admin workflows, writing, analytics, and richer publishing later."
+              title="Real technical projects, documented as case notes."
+              description="The project library now pulls from GitHub-backed work across data engineering, database operations, SaaS demos, migrations, and product tools."
             />
             <Link
               href="/projects"
