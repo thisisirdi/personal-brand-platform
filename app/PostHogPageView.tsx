@@ -1,12 +1,14 @@
 "use client";
 
 import { usePathname, useSearchParams } from "next/navigation";
+import { usePostHog } from "posthog-js/react";
 import { useEffect } from "react";
 import { useAnalytics } from "@/lib/useAnalytics";
 
 export default function PostHogPageView() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const posthog = usePostHog();
   const { capture } = useAnalytics();
 
   useEffect(() => {
@@ -17,6 +19,10 @@ export default function PostHogPageView() {
         url += `?${search}`;
       }
 
+      posthog.capture("$pageview", {
+        $current_url: url,
+      });
+
       capture("page_viewed", {
         path: pathname,
         url,
@@ -24,7 +30,7 @@ export default function PostHogPageView() {
         referrer: document.referrer || undefined,
       });
     }
-  }, [capture, pathname, searchParams]);
+  }, [capture, pathname, posthog, searchParams]);
 
   return null;
 }
