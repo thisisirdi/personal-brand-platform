@@ -13,8 +13,9 @@ The product is intentionally not a generic portfolio. It is a hybrid brand platf
 - Supabase Postgres through private `DATABASE_URL` and `DIRECT_URL`
 - Prisma ORM
 - Zod contact form validation
+- PostHog client analytics
 
-PostHog, authentication, blog, admin, and services/freelance pages are not implemented in V1.
+Authentication, blog, admin, and services/freelance pages are not implemented in V1.
 
 ## Local Setup
 
@@ -48,6 +49,8 @@ Copy-Item .env.example .env
 ```env
 NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="sb_publishable_your_key"
+NEXT_PUBLIC_POSTHOG_KEY="phc_your_project_key"
+NEXT_PUBLIC_POSTHOG_HOST="https://eu.i.posthog.com"
 DATABASE_URL="postgresql://postgres.PROJECT_REF:PASSWORD@REGION.pooler.supabase.com:6543/postgres?pgbouncer=true"
 DIRECT_URL="postgresql://postgres.PROJECT_REF:PASSWORD@REGION.pooler.supabase.com:5432/postgres"
 ```
@@ -120,4 +123,5 @@ prisma/               Prisma schema and seed script
 - Contact submissions are validated with Zod and saved through `app/api/contact/route.ts`.
 - Prisma CLI uses `DIRECT_URL` when present. App runtime uses `DATABASE_URL`.
 - `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` are reserved for future Supabase client features such as auth or storage.
-- `lib/analytics.ts` provides a no-op event boundary so PostHog can be added later without scattering analytics calls across the app.
+- PostHog is initialized in `app/providers.tsx` and captures client-side page views through `app/PostHogPageView.tsx`.
+- `lib/analytics.ts` remains a no-op server-side event boundary for future route handler events.

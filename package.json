@@ -5,10 +5,11 @@
   "description": "Minimal personal brand platform for Irdi Duka.",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "prisma generate && tsc --noEmit",
+    "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
@@ -22,6 +23,7 @@
     "lucide-react": "^1.14.0",
     "next": "^16.2.6",
     "pg": "^8.20.0",
+    "posthog-js": "^1.372.10",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "zod": "^4.4.3"

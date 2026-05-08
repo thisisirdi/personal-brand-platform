@@ -14,6 +14,7 @@ V1 prioritizes a clean foundation over breadth. It includes public pages, databa
 - App runtime connects to Supabase Postgres through private `DATABASE_URL`.
 - Prisma CLI migrations use private `DIRECT_URL` when present.
 - Public Supabase client values live in `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` for future auth or storage work.
+- PostHog client analytics are initialized in `app/providers.tsx`.
 - Tailwind CSS handles styling.
 
 ## Pages
@@ -50,14 +51,15 @@ The public Supabase URL and publishable key do not grant Prisma database access.
 4. Valid submissions are stored in the `Contact` table.
 5. The API returns clean success or error states to the client.
 
-## Analytics Boundary
+## Analytics
 
-PostHog is intentionally not implemented in V1. The app includes `lib/analytics.ts` as a no-op boundary. Current calls can stay in place and later route to PostHog capture calls without changing page or form logic.
+PostHog is implemented for client-side page view capture. `app/providers.tsx` initializes `posthog-js` when `NEXT_PUBLIC_POSTHOG_KEY` is available, and `app/PostHogPageView.tsx` captures page views from App Router navigation.
+
+`lib/analytics.ts` remains a no-op server-side boundary. Current route handler calls can later route to server-side PostHog capture without changing contact or project logic.
 
 ## Not In V1
 
 - Authentication
-- PostHog implementation
 - Blog
 - Admin
 - Services or freelance page
